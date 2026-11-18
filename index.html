@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>쉿, 오빠 깨니까 참아</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* 한 집, 벽 한 장. 화면 중앙의 세로 '벽'이 302호를 둘로 가르는 구조 */
+  --night:#0b0a10;
+  --room:#14121b;
+  --plaster:#2a2633;
+  --ink:#ece6f1;
+  --mute:#9a91a8;
+  --blush:#ff6b94;
+  --lamp:#ffb86b;
+  --display:'Nanum Pen Script','Gaegu',cursive;
+  --body:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--night);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}
+body{overflow-x:hidden;line-height:1.6}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--blush);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+/* ===== HERO ===== */
+.hero{position:relative;padding:96px 0 72px;overflow:hidden;isolation:isolate}
+.hero::before{content:"";position:absolute;inset:0;z-index:-2;
+  background:radial-gradient(60% 70% at 22% 40%,rgba(255,184,107,.13),transparent 70%),
+             radial-gradient(50% 60% at 80% 55%,rgba(255,107,148,.10),transparent 70%)}
+.door{position:absolute;left:50%;top:0;bottom:0;width:2px;z-index:-1;transform:translateX(-50%);
+  background:repeating-linear-gradient(180deg,var(--plaster) 0 14px,transparent 14px 26px)}
+.room-tag{position:absolute;top:36px;font-family:var(--mono);font-size:12px;letter-spacing:.18em;color:var(--mute)}
+.room-tag.l{left:24px}.room-tag.r{right:24px;text-align:right}
+.room-tag b{display:block;color:var(--ink);font-weight:500}
+.rating{display:inline-flex;gap:8px;align-items:center;font-family:var(--mono);font-size:12px;letter-spacing:.2em;
+  color:var(--blush);border:1px solid rgba(255,107,148,.5);padding:6px 12px;border-radius:999px;background:var(--night)}
+.rating i{width:6px;height:6px;border-radius:50%;background:var(--blush);animation:rec 1.6s infinite}
+@keyframes rec{50%{opacity:.2}}
+.title{font-family:var(--display);font-weight:400;line-height:.92;margin:28px 0 0;
+  font-size:clamp(84px,15vw,190px);text-wrap:balance;letter-spacing:-.01em}
+.title .a,.title .b{white-space:nowrap}
+.title .a{display:block;color:var(--ink)}
+.title .b{display:block;color:var(--blush);text-shadow:0 0 40px rgba(255,107,148,.35);padding-left:.6em}
+.hook{margin-top:30px;font-size:clamp(18px,2.4vw,24px);font-weight:500;max-width:30ch;background:var(--night);padding:4px 0}
+.hook em{font-style:normal;color:var(--lamp)}
+.hero-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px}
+.chip{font-size:13px;padding:7px 14px;border-radius:999px;background:var(--room);border:1px solid var(--plaster);color:var(--mute)}
+.chip b{color:var(--ink);font-weight:700}
+
+/* ===== SECTION BASE ===== */
+section{padding:72px 0;border-top:1px solid var(--plaster)}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;color:var(--blush);text-transform:uppercase}
+h2{font-size:clamp(28px,4vw,42px);font-weight:900;line-height:1.25;margin:12px 0 0;text-wrap:balance;letter-spacing:-.02em}
+.lead{color:var(--mute);margin-top:14px;max-width:56ch;font-size:16px}
+
+/* ===== FLOOR PLAN ===== */
+.plan{margin-top:40px;display:grid;grid-template-columns:1fr 14px 1fr;border:1px solid var(--plaster);border-radius:20px;overflow:hidden;background:var(--room)}
+.rm{padding:28px;min-height:200px;position:relative}
+.rm h3{font-size:20px;font-weight:900}
+.rm p{color:var(--mute);font-size:14px;margin-top:6px}
+.rm .who{position:absolute;bottom:24px;left:28px;font-family:var(--mono);font-size:12px;color:var(--lamp)}
+.wall{background:repeating-linear-gradient(0deg,var(--plaster) 0 8px,#221f2a 8px 16px);position:relative;cursor:pointer;border:0;padding:0}
+.wall span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-90deg);white-space:nowrap;
+  font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--mute)}
+.shared{grid-column:1/-1;border-top:1px solid var(--plaster);padding:18px 28px;display:flex;flex-wrap:wrap;gap:10px 22px;font-size:14px;color:var(--mute)}
+.shared b{color:var(--ink)}
+.ear{margin-top:16px;min-height:28px;font-family:var(--display);font-size:28px;color:var(--lamp);transition:opacity .4s}
+
+/* ===== CAST ===== */
+.tabs{display:flex;gap:8px;margin-top:36px;flex-wrap:wrap}
+.tab{font:inherit;font-size:15px;font-weight:700;color:var(--mute);background:transparent;border:1px solid var(--plaster);
+  padding:10px 18px;border-radius:999px;cursor:pointer;transition:.2s}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--night);border-color:var(--ink)}
+.tab small{font-weight:500;opacity:.7;margin-left:4px}
+.panel{display:none;margin-top:24px;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px}
+.panel.on{display:grid}
+.pcard{background:var(--room);border:1px solid var(--plaster);border-radius:20px;padding:32px}
+.pname{font-size:40px;font-weight:900;letter-spacing:-.03em;line-height:1.1}
+.pmeta{font-family:var(--mono);font-size:13px;color:var(--mute);margin-top:8px}
+.pdesc{margin-top:18px;font-size:16px;max-width:42ch}
+.pline{margin-top:24px;font-family:var(--display);font-size:34px;line-height:1.25;color:var(--blush)}
+.pline.n{color:#b3a7ff}
+.facts{display:grid;gap:10px;align-content:start}
+.fact{display:grid;grid-template-columns:72px 1fr;gap:12px;padding:16px 20px;background:var(--room);border:1px solid var(--plaster);border-radius:14px;font-size:14px}
+.fact dt{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--mute);padding-top:3px}
+.fact dd{color:var(--ink)}
+.role{display:inline-block;font-size:11px;font-family:var(--mono);letter-spacing:.14em;padding:4px 10px;border-radius:999px;margin-bottom:14px}
+.role.h{background:rgba(255,107,148,.14);color:var(--blush)}
+.role.nb{background:rgba(179,167,255,.12);color:#b3a7ff}
+
+.bf{margin-top:28px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.bfc{padding:20px;border:1px dashed var(--plaster);border-radius:14px}
+.bfc b{font-size:17px}
+.bfc span{display:block;font-size:13px;color:var(--mute);margin-top:4px}
+.bfc i{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--lamp)}
+
+/* ===== SCHEDULE ===== */
+.week{margin-top:36px;display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.day{font:inherit;background:var(--room);border:1px solid var(--plaster);border-radius:14px;padding:16px 8px;text-align:center;cursor:pointer;color:var(--ink);transition:.2s}
+.day .d{font-weight:900;font-size:18px}
+.day .s{display:block;height:6px;border-radius:3px;margin:12px auto 0;width:60%;background:var(--plaster)}
+.day.out .s{background:var(--lamp);box-shadow:0 0 12px rgba(255,184,107,.6)}
+.day.drink .s{background:var(--blush)}
+.day[aria-pressed="true"]{border-color:var(--ink);transform:translateY(-3px)}
+.dayinfo{margin-top:18px;padding:22px 24px;background:var(--room);border-radius:16px;border-left:3px solid var(--lamp);min-height:84px}
+.dayinfo b{font-size:18px}
+.dayinfo p{color:var(--mute);font-size:14px;margin-top:4px}
+.legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;font-size:12px;color:var(--mute)}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.legend .o::before{background:var(--lamp)}.legend .k::before{background:var(--blush)}.legend .h::before{background:var(--plaster)}
+
+/* ===== RULES ===== */
+.rules{margin-top:36px;display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.rule{background:var(--room);border:1px solid var(--plaster);border-radius:18px;padding:26px}
+.rule .k{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--mute)}
+.rule h3{font-size:21px;font-weight:900;margin-top:8px}
+.rule p{color:var(--mute);font-size:14px;margin-top:6px}
+.meter{display:flex;gap:6px;margin-top:18px}
+.meter button{flex:1;font:inherit;font-family:var(--mono);font-size:12px;padding:10px 0;border-radius:10px;border:1px solid var(--plaster);background:transparent;color:var(--mute);cursor:pointer}
+.meter button[aria-pressed="true"]{color:var(--night);font-weight:500}
+.meter button[data-v="0"][aria-pressed="true"]{background:#6fd3a5}
+.meter button[data-v="1"][aria-pressed="true"]{background:#e8d36a}
+.meter button[data-v="2"][aria-pressed="true"]{background:var(--lamp)}
+.meter button[data-v="3"][aria-pressed="true"]{background:var(--blush)}
+.mout{margin-top:12px;font-size:14px;min-height:22px}
+.sus{display:flex;gap:4px;margin-top:18px}
+.sus i{flex:1;height:8px;border-radius:4px;background:var(--plaster)}
+.sus i.f{background:var(--blush)}
+.steps5{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+.steps5 span{font-size:12px;padding:6px 10px;border-radius:999px;background:#1d1a26;color:var(--mute)}
+.steps5 span:last-child{background:rgba(255,107,148,.15);color:var(--blush)}
+
+/* ===== HUD ===== */
+.hud{margin-top:36px;background:#07060a;border:1px solid var(--plaster);border-radius:16px;padding:22px 24px;
+  font-family:var(--mono);font-size:14px;line-height:1.9;overflow-x:auto;white-space:pre;color:#cfc7da}
+.hudnote{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.hudnote div{font-size:13px;color:var(--mute);padding:12px 14px;border-radius:12px;background:var(--room)}
+.hudnote b{display:block;color:var(--ink);font-size:14px}
+
+/* ===== START ===== */
+.start{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start;margin-top:36px}
+.ol{list-style:none;counter-reset:n;display:grid;gap:12px}
+.ol li{counter-increment:n;display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:center;padding:16px 18px;background:var(--room);border-radius:14px;font-size:15px}
+.ol li::before{content:counter(n,decimal-leading-zero);font-family:var(--mono);color:var(--blush);font-size:14px}
+.opening{background:var(--room);border:1px solid var(--plaster);border-radius:18px;padding:28px}
+.opening .k{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--lamp)}
+.opening p{margin-top:12px;font-size:15px;color:#d8d0e2}
+.opening p.q{font-family:var(--display);font-size:30px;color:var(--ink);line-height:1.3}
+
+/* ===== FOOT ===== */
+.foot{padding:56px 0 80px;border-top:1px solid var(--plaster);text-align:center}
+.count{display:inline-flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.count span{font-family:var(--mono);font-size:14px;padding:10px 16px;border:1px solid var(--plaster);border-radius:999px}
+.foot .shh{font-family:var(--display);font-size:48px;color:var(--mute);margin-top:28px}
+
+/* ===== MOBILE ===== */
+@media (max-width:760px){
+  .hero{padding:84px 0 56px}
+  .title{font-size:clamp(60px,18vw,110px)}
+  .title .b{padding-left:.15em}
+  .door{left:auto;right:18px;transform:none}
+  .room-tag.r{display:none}
+  .plan{grid-template-columns:1fr 10px 1fr}
+  .rm{padding:18px;min-height:170px}
+  .rm h3{font-size:16px}
+  .rm p{font-size:12px}
+  .rm .who{left:18px;bottom:16px;font-size:10px}
+  .shared{padding:14px 18px;font-size:12px}
+  .panel{grid-template-columns:1fr}
+  .pname{font-size:34px}
+  .bf{grid-template-columns:1fr}
+  .week{gap:5px}
+  .day{padding:12px 2px;border-radius:10px}
+  .day .d{font-size:15px}
+  .rules{grid-template-columns:1fr}
+  .hudnote{grid-template-columns:1fr 1fr}
+  .start{grid-template-columns:1fr}
+  section{padding:56px 0}
+}
+
+.herogrid{display:grid;grid-template-columns:1.2fr .8fr;gap:40px;align-items:center}
+.poster{margin:0;border-radius:24px;overflow:hidden;border:1px solid var(--plaster);box-shadow:0 30px 80px rgba(255,107,148,.18);aspect-ratio:2/3;background:var(--room)}
+.poster img{width:100%;height:100%;object-fit:cover;display:block}
+.wide{margin:28px 0 0;border-radius:20px;overflow:hidden;position:relative}
+.wide img{width:100%;display:block;aspect-ratio:16/9;object-fit:cover}
+.wide figcaption{position:absolute;left:0;right:0;bottom:0;padding:40px 22px 16px;background:linear-gradient(transparent,rgba(11,10,16,.92));font-family:var(--display);font-size:30px}
+.pimg{width:calc(100% + 64px);margin:-32px -32px 24px;display:block;aspect-ratio:4/3;object-fit:cover;object-position:center 25%}
+.pcard{overflow:hidden}
+.fimg{width:100%;border-radius:14px;aspect-ratio:4/3;object-fit:cover;object-position:center 20%;display:block}
+.bfc{display:flex;gap:16px;align-items:center}
+.bfc img{width:84px;height:84px;border-radius:50%;object-fit:cover;object-position:center 22%;flex:none;border:2px solid var(--plaster)}
+.oimg{width:calc(100% + 56px);margin:-28px -28px 22px;display:block;aspect-ratio:4/3;object-fit:cover}
+.opening{overflow:hidden}
+img{max-width:100%}
+.pimg,.oimg{max-width:none}
+@media (max-width:760px){
+  body{font-size:17px}
+  .herogrid{grid-template-columns:1fr;gap:28px}
+  .poster{max-width:420px;width:100%;margin:0 auto}
+  .hook{font-size:21px}
+  h2{font-size:28px}
+  .lead{font-size:17px}
+  .eyebrow,.rating{font-size:13px}
+  .rm{min-height:190px}
+  .rm h3{font-size:18px}
+  .rm p{font-size:14px}
+  .rm .who{font-size:12px}
+  .shared{font-size:14px}
+  .ear{font-size:30px}
+  .tab{font-size:16px;padding:11px 18px}
+  .pdesc{font-size:17px}
+  .pline{font-size:32px}
+  .pmeta{font-size:14px}
+  .fact{grid-template-columns:64px 1fr;font-size:16px}
+  .fact dt{font-size:12px}
+  .bfc b{font-size:18px}.bfc span{font-size:15px}.bfc i{font-size:12px}
+  .bfc img{width:72px;height:72px}
+  .day .d{font-size:16px}
+  .dayinfo b{font-size:18px}.dayinfo p{font-size:16px}
+  .legend{font-size:14px}
+  .rule h3{font-size:21px}.rule p{font-size:16px}.rule .k{font-size:12px}
+  .meter button{font-size:15px;padding:12px 0}
+  .mout{font-size:16px}
+  .steps5 span{font-size:14px}
+  .hud{font-size:13px}
+  .hudnote div{font-size:14px}.hudnote b{font-size:15px}
+  .ol li{font-size:16px}
+  .opening p{font-size:16px}
+  .wide figcaption{font-size:26px}
+  .room-tag{display:none}
+}
+
+.bfc{flex-direction:column;align-items:stretch;padding:0;overflow:hidden;border-style:solid;background:var(--room)}
+.bfc img{width:100%;height:auto;aspect-ratio:4/3;border-radius:0;border:0;object-position:center 25%}
+.bfc>div{padding:16px 18px 20px}
+@media (max-width:760px){
+  .bfc{flex-direction:row;align-items:center}
+  .bfc img{width:132px;height:132px;aspect-ratio:1;flex:none}
+  .bfc>div{padding:14px 16px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="door" aria-hidden="true"></div>
+  <div class="room-tag l">ROOM A<b>내 방</b></div>
+  <div class="room-tag r">ROOM B<b>태민 방</b></div>
+  <div class="wrap herogrid">
+   <div>
+    <span class="rating"><i></i>19 · NTL · 장기 시뮬레이션</span>
+    <h1 class="title"><span class="a">쉿, 오빠</span><span class="b">깨니까 참아</span></h1>
+    <p class="hook">벽 한 장 너머엔 <em>내 친구</em>가 자고 있다.</p>
+   </div>
+   <figure class="poster"><img src="img/hero.webp" alt="입술에 손가락을 대고 쉿 하는 다솜"></figure>
+  </div>
+</header>
+
+<main>
+<section id="house">
+  <div class="wrap">
+    <p class="eyebrow">01 · 302호</p>
+    <h2>절친이랑 같이 사는 집.<br>그 친구 여자친구는 거의 매일 자고 간다.</h2>
+    <p class="lead">해람대 앞 투룸. 내 방과 태민 방 사이엔 석고보드 벽 한 장뿐이다. 가운데 벽을 눌러보세요.</p>
+
+    <div class="plan">
+      <div class="rm">
+        <h3>내 방</h3>
+        <p>창가 책상, 싱글 침대. 벽 쪽으로 머리를 두고 잔다.</p>
+        <span class="who">● {user}</span>
+      </div>
+      <button class="wall" id="wall" aria-label="벽에 귀 대보기"><span>GYPSUM 9.5mm</span></button>
+      <div class="rm">
+        <h3>태민 방</h3>
+        <p>게임용 모니터 두 대. 지유 칫솔이 이 집 화장실에 있다.</p>
+        <span class="who">● 태민 · 지유</span>
+      </div>
+      <div class="shared">
+        <span><b>거실</b> 소파베드</span>
+        <span><b>화장실</b> 1개, 잠금 고장</span>
+        <span><b>베란다</b> 세탁기 · 흡연</span>
+        <span><b>202호</b> 바로 아래층</span>
+      </div>
+    </div>
+    <p class="ear" id="ear" aria-live="polite"></p>
+    <figure class="wide"><img src="img/group.webp" alt="302호 거실 술자리"><figcaption>금요일 밤, 302호 거실</figcaption></figure>
+  </div>
+</section>
+
+<section id="cast">
+  <div class="wrap">
+    <p class="eyebrow">02 · 등장인물</p>
+    <h2>다들 각자 남자친구가 있다.</h2>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" aria-controls="p-jiyu" id="t-jiyu">한지유<small>22</small></button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="p-dasom" id="t-dasom">윤다솜<small>22</small></button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="p-eunsol" id="t-eunsol">노은솔<small>21</small></button>
+    </div>
+
+    <div class="panel on" id="p-jiyu" role="tabpanel" aria-labelledby="t-jiyu">
+      <div class="pcard">
+        <img class="pimg" src="img/jiyu.webp" alt="한지유"><span class="role h">HEROINE</span>
+        <div class="pname">한지유</div>
+        <div class="pmeta">22 · 간호학과 3학년 · 태민 여자친구</div>
+        <p class="pdesc">착하고 다정하다. 실습에 지쳐도 웃는다. 요즘은 태민 방에서 나올 때 표정이 조금 어둡다.</p>
+        <p class="pline">"…오빠, 태민이 깨니까 조용히 해."</p>
+      </div>
+      <dl class="facts">
+        <img class="fimg" src="img/jiyu2.webp" alt="간호 실습복 차림의 지유">
+        <div class="fact"><dt>남친</dt><dd>강태민 · 내 절친</dd></div>
+        <div class="fact"><dt>생활</dt><dd>병원 실습 · 거의 매일 302호에서 잠</dd></div>
+        <div class="fact"><dt>성격</dt><dd>남 부탁 못 거절함 · 싫은 소리 삼킴</dd></div>
+        <div class="fact"><dt>포인트</dt><dd>태민과 나, 둘 다 "오빠"라고 부른다</dd></div>
+      </dl>
+    </div>
+
+    <div class="panel" id="p-dasom" role="tabpanel" aria-labelledby="t-dasom">
+      <div class="pcard">
+        <img class="pimg" src="img/dasom.webp" alt="윤다솜"><span class="role h">HEROINE</span>
+        <div class="pname">윤다솜</div>
+        <div class="pmeta">22 · 패션디자인과 · 지유 절친</div>
+        <p class="pdesc">눈치 빠르고 말이 거침없다. 금요일 술자리 끝나면 302호 소파에서 자고 간다.</p>
+        <p class="pline">"너 지금 지유 쳐다봤지? 나 다 봤어~"</p>
+      </div>
+      <dl class="facts">
+        <img class="fimg" src="img/dasom2.webp" alt="모델 촬영 중인 다솜">
+        <div class="fact"><dt>남친</dt><dd>정우석 · 헬스 트레이너</dd></div>
+        <div class="fact"><dt>생활</dt><dd>졸업작품 · 쇼핑몰 모델 알바</dd></div>
+        <div class="fact"><dt>성격</dt><dd>먼저 떠보고 먼저 도발함 · 스릴 좋아함</dd></div>
+        <div class="fact"><dt>포인트</dt><dd>남친이 위치공유 앱으로 늘 확인한다</dd></div>
+      </dl>
+    </div>
+
+    <div class="panel" id="p-eunsol" role="tabpanel" aria-labelledby="t-eunsol">
+      <div class="pcard">
+        <img class="pimg" src="img/eunsol.webp" alt="노은솔"><span class="role nb">NEIGHBOR · 202호</span>
+        <div class="pname">노은솔</div>
+        <div class="pmeta">21 · 기계공학과 2학년 · 내 과후배</div>
+        <p class="pdesc">말수 적은 모범생. 바로 아래층에 살고, 과제 때문에 자주 선배를 찾아온다.</p>
+        <p class="pline n">"서, 선배… 어젯밤에 좀… 시끄러웠어요."</p>
+      </div>
+      <dl class="facts">
+        <img class="fimg" src="img/eunsol2.webp" alt="노트북으로 글 쓰는 은솔">
+        <div class="fact"><dt>남친</dt><dd>박준호 · 과대</dd></div>
+        <div class="fact"><dt>생활</dt><dd>과제 · 실험 · 혼자 글 쓰기</dd></div>
+        <div class="fact"><dt>성격</dt><dd>말 더듬음 · 낯을 많이 가림</dd></div>
+        <div class="fact"><dt>포인트</dt><dd>층간소음 항의는 늘 포스트잇으로</dd></div>
+      </dl>
+    </div>
+
+    <div class="bf">
+      <div class="bfc"><img src="img/taemin.webp" alt="강태민"><div><i>지유 남친</i><br><b>강태민 · 23</b><span>내 절친. 게임 좋아함. 화·목·토 물류센터 야간</span></div></div>
+      <div class="bfc"><img src="img/wooseok.webp" alt="정우석"><div><i>다솜 남친</i><br><b>정우석 · 26</b><span>헬스 트레이너. 연락 집착이 심하다</span></div></div>
+      <div class="bfc"><img src="img/junho.webp" alt="박준호"><div><i>은솔 남친</i><br><b>박준호 · 23</b><span>과대. 늘 바빠서 은솔에게 소홀하다</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="week">
+  <div class="wrap">
+    <p class="eyebrow">03 · 태민 시간표</p>
+    <h2>태민이 없는 밤을 기억하세요.</h2>
+    <p class="lead">세계는 기다려주지 않아요. 알바, 술자리, 본가 일정은 정해진 대로 흘러가요. 요일을 눌러보세요.</p>
+    <div class="week" id="weekgrid"></div>
+    <div class="dayinfo" id="dayinfo" aria-live="polite"></div>
+    <div class="legend"><span class="o">태민 외출</span><span class="k">술자리</span><span class="h">태민 집</span></div>
+  </div>
+</section>
+
+<section id="rules">
+  <div class="wrap">
+    <p class="eyebrow">04 · 이렇게 굴러가요</p>
+    <h2>얇은 벽, 쌓이는 의심, 천천히 무너지는 마음.</h2>
+    <div class="rules">
+      <div class="rule">
+        <span class="k">🔊 소음 0 – 3</span>
+        <h3>벽이 얇아요</h3>
+        <p>소리가 클수록 옆방과 아래층까지 들려요. 단계를 눌러보세요.</p>
+        <div class="meter" id="meter">
+          <button data-v="0" aria-pressed="true">0</button><button data-v="1" aria-pressed="false">1</button>
+          <button data-v="2" aria-pressed="false">2</button><button data-v="3" aria-pressed="false">3</button>
+        </div>
+        <p class="mout" id="mout"></p>
+      </div>
+      <div class="rule">
+        <span class="k">👁 의심 0 – 5</span>
+        <h3>남친마다 의심이 쌓여요</h3>
+        <p>늦은 답장, 낯선 향수, 엇갈린 말. 하나씩 쌓이고 저절로 내려가지 않아요. 5가 되면 들켜요.</p>
+        <div class="sus" aria-label="의심 2/5"><i class="f"></i><i class="f"></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="rule">
+        <span class="k">💕 마음의 단계</span>
+        <h3>한 번에 넘어오는 사람은 없어요</h3>
+        <p>대화, 함께한 일, 지킨 약속이 쌓여야 다음 단계로 가요. 거절도, 뒷걸음도 있어요.</p>
+        <div class="steps5"><span>경계</span><span>의식</span><span>흔들림</span><span>배덕</span><span>함락</span></div>
+      </div>
+      <div class="rule">
+        <span class="k">🌍 혼자 움직이는 세계</span>
+        <h3>내가 없어도 다들 산다</h3>
+        <p>지유는 실습을 가고, 다솜은 우석과 싸우고, 은솔은 과제를 한다. 놓친 일은 놓친 채로 흘러가요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="hud">
+  <div class="wrap">
+    <p class="eyebrow">05 · 상태창</p>
+    <h2>매 응답 맨 아래, 지금 상황이 정리돼요.</h2>
+<div class="hud">[#1｜3/3(화) 22:05｜302호 거실｜태민:물류센터(~06:00)]
+💕지유:경계｜다솜:경계
+👁태민0｜우석0｜준호0
+🔊0</div>
+    <div class="hudnote">
+      <div><b>첫 줄</b>턴 · 날짜 · 장소 · 태민 위치</div>
+      <div><b>💕</b>각자 마음의 단계</div>
+      <div><b>👁</b>남친별 의심 0–5</div>
+      <div><b>🔊</b>지금 소음 0–3</div>
+    </div>
+  </div>
+</section>
+
+<section id="start">
+  <div class="wrap">
+    <p class="eyebrow">06 · 처음이라면</p>
+    <h2>화요일 밤 10시, 태민이 막 나갔다.</h2>
+    <div class="start">
+      <ol class="ol">
+        <li>태민이 야간 나간 화요일 밤부터 시작해요</li>
+        <li>거실에 남은 지유에게 먼저 말 걸어보세요</li>
+        <li>태민이 돌아오는 아침 6시를 잊지 마세요</li>
+        <li>상태창으로 의심과 소음을 계속 확인해요</li>
+      </ol>
+      <div class="opening">
+        <img class="oimg" src="img/leave.webp" alt="야간 출근하는 태민을 배웅하는 지유"><span class="k">OPENING · 22:05</span>
+        <p>현관문이 닫히는 소리. 태민의 발소리가 계단 아래로 멀어진다.</p>
+        <p>잠시 뒤, 태민 방 문이 조용히 열린다.</p>
+        <p class="q">"…오빠, 아직 안 자?"</p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p class="shh">쉿.</p>
+  </div>
+</footer>
+
+<script>
+/* tabs */
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected','false'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  t.setAttribute('aria-selected','true');
+  document.getElementById(t.getAttribute('aria-controls')).classList.add('on');
+}));
+
+/* wall */
+const lines=['…쿵.','(뒤척이는 소리)','"…자?"','(작게 웃는 소리)','…조용.'];
+let li=0;const ear=document.getElementById('ear');
+ear.textContent='벽에 귀를 대면… 뭔가 들린다.';
+document.getElementById('wall').addEventListener('click',()=>{ear.style.opacity=0;setTimeout(()=>{ear.textContent=lines[li++%lines.length];ear.style.opacity=1},180)});
+
+/* week */
+const days=[
+ ['월','h','태민 집','저녁엔 거실에서 게임. 지유도 같이 있다.'],
+ ['화','out','태민 야간 22:00 – 06:00','물류센터 출근. 지유는 302호에 남는다.'],
+ ['수','h','태민 집','둘 다 수업. 저녁은 셋이 같이 먹을 때가 많다.'],
+ ['목','out','태민 야간 22:00 – 06:00','두 번째 야간. 지유 실습 끝나는 날과 겹치기도 한다.'],
+ ['금','drink','술자리','다 같이 마신다. 끝나면 다솜이 거실 소파에서 자고 간다.'],
+ ['토','out','태민 야간 22:00 – 06:00','주말 야간. 격주로는 아예 본가에 간다.'],
+ ['일','h','태민 집 · 격주 본가','본가 가는 주엔 일요일 저녁에 돌아온다.']
+];
+const wg=document.getElementById('weekgrid'),di=document.getElementById('dayinfo');
+function show(i,btn){
+  wg.querySelectorAll('.day').forEach(b=>b.setAttribute('aria-pressed','false'));
+  btn.setAttribute('aria-pressed','true');
+  di.innerHTML='<b>'+days[i][0]+'요일 · '+days[i][2]+'</b><p>'+days[i][3]+'</p>';
+  di.style.borderLeftColor=days[i][1]==='out'?'var(--lamp)':days[i][1]==='drink'?'var(--blush)':'var(--plaster)';
+}
+days.forEach((d,i)=>{const b=document.createElement('button');b.className='day '+d[1];b.id='day-'+i;
+  b.innerHTML='<span class="d">'+d[0]+'</span><span class="s"></span>';b.addEventListener('click',()=>show(i,b));wg.appendChild(b);});
+show(1,wg.children[1]);
+
+/* meter */
+const msg=['조용함. 아무도 모른다.','옆방에서 뒤척일 정도.','태민 방까지 들린다. 위험.','아래층 은솔까지 다 들린다.'];
+const mout=document.getElementById('mout');
+function setM(v){document.querySelectorAll('#meter button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v==v?'true':'false'));mout.textContent=msg[v];}
+document.querySelectorAll('#meter button').forEach(b=>b.addEventListener('click',()=>setM(b.dataset.v)));
+setM(0);
+</script>
+</body>
+</html>
